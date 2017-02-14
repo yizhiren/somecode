@@ -1,0 +1,7 @@
+my self dfs
+and 
+floyd
+both meet timeout
+
+only Dijkstra All Clear.
+congratulation for Dijkstra!
