@@ -1,0 +1,116 @@
+参考：
+http://blog.csdn.net/liuchuo/article/details/53561924
+
+分析：
+这道题实际上考察AVL树和层序遍历两个知识点。
+判断是不是完全二叉树，就看在出现了一个孩子为空的结点之后是否还会出现孩子结点不为空的结点，如果出现了就不是完全二叉树。
+AVL树一共有四种情况，这里我把发现树不平衡的那个结点叫做A结点，A发现树不平衡的情况有四种：
+新来的结点插入到A的左子树的左子树
+新来的结点插入到A的左子树的右子树
+新来的结点插入到A的右子树的左子树
+新来的结点插入到A的右子树的右子树
+发现不平衡时就需要处理，第1种情况只要简单的右旋，第4种情况只需左旋一下，
+第2种情况需要先对A的左子树左旋一下，然后对A右旋，
+同理第3种情况需要对A的右子树右旋一下，然后对A左旋，
+
+struct Node* leftRotate(struct Node *tree) {
+    struct Node *temp = tree->right;
+    tree->right = temp->left;
+    temp->left = tree;
+    return temp;
+}
+
+struct Node* rightRotate(struct Node *tree) {
+    struct Node *temp = tree->left;
+    tree->left = temp->right;
+    temp->right = tree;
+    return temp;
+}
+
+struct Node* leftRightRotate(struct Node *tree) {
+    tree->left = leftRotate(tree->left);
+    tree = rightRotate(tree);
+    return tree;
+}
+
+struct Node* rightLeftRotate(struct Node *tree) {
+    tree->right = rightRotate(tree->right);
+    tree = leftRotate(tree);
+    return tree;
+}
+
+
+
+我的代码
+/*
+    0
+   /
+  0
+ /
+0
+
+*/
+void leftleft(int node){
+	//std::cout << "LL " << node << endl;
+	Node node_high = tree[node];
+	Node node_mid = tree[node_high.left];
+	
+	tree[node].value = node_mid.value;
+	tree[node].left = node_mid.left;
+	tree[node].right = node_high.left;
+	
+	tree[node_high.left].value = node_high.value;
+	tree[node_high.left].left = node_mid.right;
+	tree[node_high.left].right = node_high.right;
+	
+}
+
+/*
+0
+ \
+  0
+   \
+    0
+
+*/
+void rightright(int node){
+	//std::cout << "RR " << node << endl;
+	Node node_high = tree[node];
+	Node node_mid = tree[node_high.right];
+	
+	tree[node].value = node_mid.value;
+	tree[node].left = node_high.right;
+	tree[node].right = node_mid.right;
+	
+	tree[node_high.right].value = node_high.value;
+	tree[node_high.right].left = node_high.left;
+	tree[node_high.right].right = node_mid.left;
+}
+
+/*
+    0
+   /
+  0
+   \
+    0
+
+*/
+void leftright(int node){
+	//std::cout << "LR " << node << endl;
+	rightright(tree[node].left);
+	leftleft(node);
+}
+
+/*
+0
+ \
+  0
+ /
+0
+
+*/
+void rightleft(int node){
+	//std::cout << "RL " << node << endl;
+	leftleft(tree[node].right);
+	rightright(node);
+}
